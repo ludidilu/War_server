@@ -19,6 +19,5 @@ public class ConfigDictionary : Config
         }
     }
 
-    public string table_path;
-    public string map_path;
+    public string data_path = "../War_data";
 }
