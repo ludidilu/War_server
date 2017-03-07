@@ -10,8 +10,6 @@ namespace FinalWar_server
 
         private static Server<PlayerUnit> server;
 
-        private static BattleManager battleManager;
-
         private static int timeStep;
 
         private static void WriteLog(string _str)
@@ -31,8 +29,6 @@ namespace FinalWar_server
 
             timeStep = (int)(GameConfig.Instance.timeStep * 1000);
 
-            battleManager = new BattleManager();
-
             server = new Server<PlayerUnit>();
 
             server.Start("0.0.0.0", 1983, 100);
@@ -46,28 +42,24 @@ namespace FinalWar_server
 
             watch.Start();
 
+            long lastUpdateTime = watch.ElapsedMilliseconds;
+
             while (true)
             {
-                long time = watch.ElapsedMilliseconds;
-
                 server.Update();
 
-                battleManager.Update();
-
-                Thread.Sleep(10);
+                Thread.Sleep(1);
 
                 long nowTime = watch.ElapsedMilliseconds;
 
-                int deltaTime = (int)(nowTime - time);
+                long deltaTime = nowTime - lastUpdateTime;
 
-                if (deltaTime > timeStep)
+                if(deltaTime > timeStep)
                 {
-                    Console.WriteLine("服务器在一tick中运行时间超过" + timeStep + "毫秒了!!!!!!!!!!!!!!!!!!!!!!");
+                    BattleManager.Instance.Update();
 
-                    continue;
+                    lastUpdateTime = watch.ElapsedMilliseconds;
                 }
-
-                Thread.Sleep(timeStep - deltaTime);
             }
         }
     }

@@ -11,7 +11,7 @@ internal class PlayerUnit : IUnit
 
         if (sendDataCallBack != null)
         {
-            //BattleManager.Instance.PlayerEnter(this);
+            BattleManager.Instance.PlayerEnter(this);
         }
     }
 
