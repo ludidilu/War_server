@@ -44,15 +44,19 @@ namespace FinalWar_server
 
             long lastUpdateTime = watch.ElapsedMilliseconds;
 
+            long nowTime;
+
+            long deltaTime;
+
             while (true)
             {
                 server.Update();
 
                 Thread.Sleep(1);
 
-                long nowTime = watch.ElapsedMilliseconds;
+                nowTime = watch.ElapsedMilliseconds;
 
-                long deltaTime = nowTime - lastUpdateTime;
+                deltaTime = nowTime - lastUpdateTime;
 
                 if(deltaTime > timeStep)
                 {

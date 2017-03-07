@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="battle\BattleManager.cs" />
+    <Compile Include="battle\BattleUnit.cs" />
     <Compile Include="config\Config.cs" />
     <Compile Include="config\ConfigDictionary.cs" />
     <Compile Include="config\GameConfig.cs" />
