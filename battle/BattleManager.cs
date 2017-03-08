@@ -25,7 +25,10 @@ class BattleManager
 
     public void PlayerEnter(IUnit _unit)
     {
-        
+        if (dic.ContainsKey(_unit))
+        {
+
+        }
     }
 
     public void Update()
