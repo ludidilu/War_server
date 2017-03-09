@@ -25,14 +25,28 @@ class BattleManager
 
     public void PlayerEnter(IUnit _unit)
     {
-        if (dic.ContainsKey(_unit))
+        if (!dic.ContainsKey(_unit))
         {
+            BattleUnit battleUnit = new BattleUnit();
 
+            battleUnit.Init(_unit);
+
+            dic.Add(_unit, battleUnit);
         }
+    }
+
+    public void ReceiveData(IUnit _unit, byte[] _bytes)
+    {
+        dic[_unit].ReceiveData(_bytes);
     }
 
     public void Update()
     {
+        Dictionary<IUnit, BattleUnit>.ValueCollection.Enumerator enumerator = dic.Values.GetEnumerator();
 
+        while (enumerator.MoveNext())
+        {
+            enumerator.Current.Update();
+        }
     }
 }

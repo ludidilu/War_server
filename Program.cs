@@ -25,7 +25,16 @@ namespace FinalWar_server
 
             StaticData.path = ConfigDictionary.Instance.data_path + "/table";
 
+            StaticData.Load<UnitSDS>("unit");
+
             GameConfig.Instance.LoadLocalConfig(ConfigDictionary.Instance.data_path + "/config/" + gameConfigName);
+
+            Func<int, IUnitSDS> fun = delegate (int _id)
+             {
+                 return StaticData.GetData<UnitSDS>(_id);
+             };
+
+            Battle.Init(GameConfig.Instance, fun);
 
             timeStep = (int)(GameConfig.Instance.timeStep * 1000);
 

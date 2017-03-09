@@ -219,6 +219,32 @@ public class StaticData
 
                     break;
 
+                case "Double":
+
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        _info.SetValue(_csv, 0);
+                    }
+                    else
+                    {
+                        _info.SetValue(_csv, double.Parse(_data));
+                    }
+
+                    break;
+
+                case "Int16":
+
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        _info.SetValue(_csv, 0);
+                    }
+                    else
+                    {
+                        _info.SetValue(_csv, Int16.Parse(_data));
+                    }
+
+                    break;
+
                 case "Int32[]":
 
                     int[] intResult;
@@ -284,29 +310,57 @@ public class StaticData
 
                     break;
 
-                default:
+                case "Double[]":
 
-                    float[] floatResult;
+                    double[] doubleResult;
 
                     if (!string.IsNullOrEmpty(_data))
                     {
                         string[] strArr = _data.Split('$');
 
-                        floatResult = new float[strArr.Length];
+                        doubleResult = new double[strArr.Length];
 
                         for (int i = 0; i < strArr.Length; i++)
                         {
-                            floatResult[i] = float.Parse(strArr[i]);
+                            doubleResult[i] = double.Parse(strArr[i]);
                         }
                     }
                     else
                     {
-                        floatResult = new float[0];
+                        doubleResult = new double[0];
                     }
 
-                    _info.SetValue(_csv, floatResult);
+                    _info.SetValue(_csv, doubleResult);
 
                     break;
+
+                case "Int16[]":
+
+                    short[] shortResult;
+
+                    if (!string.IsNullOrEmpty(_data))
+                    {
+                        string[] strArr = _data.Split('$');
+
+                        shortResult = new short[strArr.Length];
+
+                        for (int i = 0; i < strArr.Length; i++)
+                        {
+                            shortResult[i] = Int16.Parse(strArr[i]);
+                        }
+                    }
+                    else
+                    {
+                        shortResult = new short[0];
+                    }
+
+                    _info.SetValue(_csv, shortResult);
+
+                    break;
+
+                default:
+
+                    throw new Exception("csv表中的类型不支持反射  setData:" + _info.Name + "   " + _info.FieldType.Name + "   " + _data);
             }
         }
         catch (Exception e)

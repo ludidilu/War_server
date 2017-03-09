@@ -67,6 +67,7 @@
     <Compile Include="config\ConfigDictionary.cs" />
     <Compile Include="config\GameConfig.cs" />
     <Compile Include="csv\CsvBase.cs" />
+    <Compile Include="csv\sds\UnitSDS.cs" />
     <Compile Include="csv\StaticData.cs" />
     <Compile Include="player\IUnit.cs" />
     <Compile Include="player\PlayerUnit.cs" />
@@ -75,9 +76,7 @@
     <Compile Include="server\Server.cs" />
     <Compile Include="server\ServerUnit.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="csv\sds\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
