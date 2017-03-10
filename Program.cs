@@ -67,11 +67,22 @@ namespace FinalWar_server
 
                 deltaTime = nowTime - lastUpdateTime;
 
-                if(deltaTime > timeStep)
+                if (deltaTime >= timeStep)
                 {
+                    Log.Write("deltaTime1:" + deltaTime);
+
+                    lastUpdateTime = nowTime;
+
                     BattleManager.Instance.Update();
 
-                    lastUpdateTime = watch.ElapsedMilliseconds;
+                    deltaTime = watch.ElapsedMilliseconds - nowTime;
+
+                    Log.Write("deltaTime2:" + deltaTime);
+
+                    if (deltaTime > timeStep)
+                    {
+                        throw new Exception("server time too long " + deltaTime);
+                    }
                 }
             }
         }
