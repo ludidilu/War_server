@@ -1,19 +1,65 @@
-﻿class BattleUnit
+﻿using System.IO;
+
+internal class BattleUnit
 {
-    private Battle battle = new Battle();
+    private IUnit mPlayer;
+    private IUnit oPlayer;
 
-    public void Init(IUnit _unit)
+    private Battle battle;
+
+    internal BattleUnit()
     {
-        battle.ServerStart(_unit.SendData);
+        battle = new Battle();
+
+        battle.ServerInit(SendData, BattleOver);
     }
 
-    public void ReceiveData(byte[] _bytes)
+    internal void Start(IUnit _mPlayer, IUnit _oPlayer)
     {
-        battle.ServerGetBytes(_bytes);
+        mPlayer = _mPlayer;
+        oPlayer = _oPlayer;
+
+        battle.ServerStart();
     }
 
-    public void Update()
+    internal void ReceiveData(IUnit _playerUnit, byte[] _bytes)
+    {
+        battle.ServerGetBytes(_playerUnit == mPlayer, _bytes);
+    }
+
+    internal void Update()
     {
         battle.Update();
+    }
+
+    private void SendData(bool _isMine, MemoryStream _ms)
+    {
+        using (MemoryStream ms = new MemoryStream())
+        {
+            using (BinaryWriter bw = new BinaryWriter(ms))
+            {
+                bw.Write((short)0);
+
+                short length = (short)_ms.Length;
+
+                bw.Write(length);
+
+                bw.Write(_ms.GetBuffer(), 0, length);
+
+                if (_isMine)
+                {
+                    mPlayer.SendData(ms);
+                }
+                else
+                {
+                    oPlayer.SendData(ms);
+                }
+            }
+        }
+    }
+
+    private void BattleOver()
+    {
+        BattleManager.Instance.BattleOver(this);
     }
 }

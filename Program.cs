@@ -69,7 +69,7 @@ namespace FinalWar_server
 
                 if (deltaTime >= timeStep)
                 {
-                    Log.Write("deltaTime1:" + deltaTime);
+                    //Log.Write("deltaTime1:" + deltaTime);
 
                     lastUpdateTime = nowTime;
 
@@ -77,7 +77,7 @@ namespace FinalWar_server
 
                     deltaTime = watch.ElapsedMilliseconds - nowTime;
 
-                    Log.Write("deltaTime2:" + deltaTime);
+                    //Log.Write("deltaTime2:" + deltaTime);
 
                     if (deltaTime > timeStep)
                     {
