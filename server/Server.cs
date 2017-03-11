@@ -3,9 +3,10 @@ using System.Net.Sockets;
 using System.Net;
 using System.Collections.Generic;
 
-
 internal class Server<T> where T : IUnit, new()
 {
+    private object locker = new object();
+
     private Socket socket;
 
     private LinkedList<ServerUnit<T>> noLoginList = new LinkedList<ServerUnit<T>>();
@@ -13,6 +14,8 @@ internal class Server<T> where T : IUnit, new()
     private Dictionary<int, ServerUnit<T>> loginDic = new Dictionary<int, ServerUnit<T>>();
 
     private Dictionary<int, T> logoutDic = new Dictionary<int, T>();
+
+    private LinkedList<ServerUnit<T>> unitPool = new LinkedList<ServerUnit<T>>();
 
     private int tick = 0;
 
@@ -38,10 +41,21 @@ internal class Server<T> where T : IUnit, new()
 
         Console.WriteLine("One user connect");
 
-        ServerUnit<T> serverUnit = new ServerUnit<T>();
-
-        lock (noLoginList)
+        lock (locker)
         {
+            ServerUnit<T> serverUnit;
+
+            if (unitPool.Count == 0)
+            {
+                serverUnit = new ServerUnit<T>();
+            }
+            else
+            {
+                serverUnit = unitPool.Last.Value;
+
+                unitPool.RemoveLast();
+            }
+
             noLoginList.AddLast(serverUnit);
 
             serverUnit.Init(clientSocket, tick);
@@ -52,7 +66,7 @@ internal class Server<T> where T : IUnit, new()
 
     internal void Update()
     {
-        lock (noLoginList)
+        lock (locker)
         {
             tick++;
 
@@ -108,38 +122,40 @@ internal class Server<T> where T : IUnit, new()
 
                 node = nextNode;
             }
-        }
 
-        LinkedList<KeyValuePair<int, ServerUnit<T>>> kickList = null;
+            LinkedList<KeyValuePair<int, ServerUnit<T>>> kickList = null;
 
-        Dictionary<int, ServerUnit<T>>.Enumerator enumerator = loginDic.GetEnumerator();
+            Dictionary<int, ServerUnit<T>>.Enumerator enumerator = loginDic.GetEnumerator();
 
-        while (enumerator.MoveNext())
-        {
-            bool kick = enumerator.Current.Value.Update(tick);
-
-            if (kick)
+            while (enumerator.MoveNext())
             {
-                if (kickList == null)
+                bool kick = enumerator.Current.Value.Update(tick);
+
+                if (kick)
                 {
-                    kickList = new LinkedList<KeyValuePair<int, ServerUnit<T>>>();
+                    if (kickList == null)
+                    {
+                        kickList = new LinkedList<KeyValuePair<int, ServerUnit<T>>>();
+                    }
+
+                    kickList.AddLast(enumerator.Current);
                 }
-
-                kickList.AddLast(enumerator.Current);
             }
-        }
 
-        if (kickList != null)
-        {
-            LinkedList<KeyValuePair<int, ServerUnit<T>>>.Enumerator enumerator2 = kickList.GetEnumerator();
-
-            while (enumerator2.MoveNext())
+            if (kickList != null)
             {
-                KeyValuePair<int, ServerUnit<T>> pair = enumerator2.Current;
+                LinkedList<KeyValuePair<int, ServerUnit<T>>>.Enumerator enumerator2 = kickList.GetEnumerator();
 
-                loginDic.Remove(pair.Key);
+                while (enumerator2.MoveNext())
+                {
+                    KeyValuePair<int, ServerUnit<T>> pair = enumerator2.Current;
 
-                logoutDic.Add(pair.Key, pair.Value.unit);
+                    loginDic.Remove(pair.Key);
+
+                    logoutDic.Add(pair.Key, pair.Value.unit);
+
+                    unitPool.AddLast(pair.Value);
+                }
             }
         }
     }

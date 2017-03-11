@@ -18,7 +18,7 @@ internal class ServerUnit<T> where T : IUnit, new()
 
     internal T unit { get; private set; }
 
-    private bool isReceiveHead = true;
+    private bool isReceiveHead;
 
     private int lastTick;
 
@@ -27,6 +27,8 @@ internal class ServerUnit<T> where T : IUnit, new()
         socket = _socket;
 
         lastTick = _tick;
+
+        isReceiveHead = true;
     }
 
     internal void SetUnit(T _unit)
@@ -138,15 +140,22 @@ internal class ServerUnit<T> where T : IUnit, new()
 
     internal void SendData(MemoryStream _ms)
     {
-        int length = HEAD_LENGTH + (int)_ms.Length;
+        try
+        {
+            int length = HEAD_LENGTH + (int)_ms.Length;
 
-        byte[] bytes = new byte[length];
+            byte[] bytes = new byte[length];
 
-        Array.Copy(BitConverter.GetBytes((ushort)_ms.Length), bytes, HEAD_LENGTH);
+            Array.Copy(BitConverter.GetBytes((ushort)_ms.Length), bytes, HEAD_LENGTH);
 
-        Array.Copy(_ms.GetBuffer(), 0, bytes, HEAD_LENGTH, _ms.Length);
+            Array.Copy(_ms.GetBuffer(), 0, bytes, HEAD_LENGTH, _ms.Length);
 
-        socket.BeginSend(bytes, 0, length, SocketFlags.None, SendCallBack, null);
+            socket.BeginSend(bytes, 0, length, SocketFlags.None, SendCallBack, null);
+        }
+        catch(Exception e)
+        {
+            lastTick = int.MinValue;
+        }
     }
 
     private void SendCallBack(IAsyncResult _result)
