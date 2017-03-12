@@ -45,6 +45,7 @@ internal class BattleManager
         {
             ReplyClient(_playerUnit, PlayerState.BATTLE);
 
+            //必须第一时间刷新所有数据  否则如果update包先下发了就麻烦了
             battleListWithPlayer[_playerUnit].Refresh(_playerUnit);
         }
         else
