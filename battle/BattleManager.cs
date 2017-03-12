@@ -44,6 +44,8 @@ internal class BattleManager
         if (battleListWithPlayer.ContainsKey(_playerUnit))
         {
             ReplyClient(_playerUnit, PlayerState.BATTLE);
+
+            battleListWithPlayer[_playerUnit].Refresh(_playerUnit);
         }
         else
         {
@@ -51,7 +53,7 @@ internal class BattleManager
             {
                 lastPlayer = null;
             }
-            
+
             ReplyClient(_playerUnit, PlayerState.FREE);
         }
     }

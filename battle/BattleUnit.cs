@@ -22,6 +22,11 @@ internal class BattleUnit
         battle.ServerStart();
     }
 
+    internal void Refresh(IUnit _playerUnit)
+    {
+        battle.ServerRefresh(_playerUnit == mPlayer);
+    }
+
     internal void ReceiveData(IUnit _playerUnit, byte[] _bytes)
     {
         battle.ServerGetBytes(_playerUnit == mPlayer, _bytes);
