@@ -143,6 +143,10 @@ internal class BattleManager
                     battleUnit.Start(_playerUnit, tmpPlayer);
 
                     ReplyClient(_playerUnit, PlayerState.BATTLE);
+
+                    battleUnit.Refresh(_playerUnit);
+
+                    battleUnit.Refresh(tmpPlayer);
                 }
 
                 break;
