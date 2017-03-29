@@ -27,6 +27,8 @@ namespace FinalWar_server
 
             StaticData.Load<UnitSDS>("unit");
 
+            StaticData.Load<SkillSDS>("skill");
+
             GameConfig.Instance.LoadLocalConfig(ConfigDictionary.Instance.data_path + "/config/" + gameConfigName);
 
             Func<int, IUnitSDS> fun = delegate (int _id)
@@ -34,7 +36,12 @@ namespace FinalWar_server
                  return StaticData.GetData<UnitSDS>(_id);
              };
 
-            Battle.Init(GameConfig.Instance, fun);
+            Func<int, ISkillSDS> fun2 = delegate (int _id)
+            {
+                return StaticData.GetData<SkillSDS>(_id);
+            };
+
+            Battle.Init(GameConfig.Instance, fun, fun2);
 
             timeStep = (int)(GameConfig.Instance.timeStep * 1000);
 
