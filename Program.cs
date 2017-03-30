@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Diagnostics;
+using System.IO;
 
 namespace FinalWar_server
 {
@@ -8,18 +9,49 @@ namespace FinalWar_server
     {
         public const string gameConfigName = "gameConfig.xml";
 
+        private const string logPath = "e:/server.txt";
+
+        private const bool writeLog = false;
+
         private static Server<PlayerUnit> server;
 
         private static int timeStep;
 
-        private static void WriteLog(string _str)
+        private static void PrintLog(string _str)
         {
             Console.WriteLine(_str);
         }
 
+        private static void WriteLog(string _str)
+        {
+            using (FileStream fs = new FileStream(logPath, FileMode.Append))
+            {
+                using (StreamWriter bw = new StreamWriter(fs))
+                {
+                    bw.Write(_str);
+
+                    fs.Flush();
+                }
+            }
+        }
+
         static void Main(string[] args)
         {
-            Log.Init(WriteLog);
+            if (writeLog)
+            {
+                FileInfo fi = new FileInfo(logPath);
+
+                if (fi.Exists)
+                {
+                    fi.Delete();
+                }
+
+                Log.Init(PrintLog, WriteLog);
+            }
+            else
+            {
+                Log.Init(PrintLog, null);
+            }
 
             ConfigDictionary.Instance.LoadLocalConfig("local.xml");
 
