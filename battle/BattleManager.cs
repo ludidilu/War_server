@@ -52,10 +52,12 @@ internal class BattleManager
         {
             if (_playerUnit == lastPlayer)
             {
-                lastPlayer = null;
+                ReplyClient(_playerUnit, PlayerState.SEARCH);
             }
-
-            ReplyClient(_playerUnit, PlayerState.FREE);
+            else
+            {
+                ReplyClient(_playerUnit, PlayerState.FREE);
+            }
         }
     }
 
@@ -79,23 +81,17 @@ internal class BattleManager
 
                             battleListWithPlayer[_playerUnit].ReceiveData(_playerUnit, bytes);
                         }
-                        else
-                        {
-                            if (_playerUnit == lastPlayer)
-                            {
-                                lastPlayer = null;
-                            }
-
-                            ReplyClient(_playerUnit, PlayerState.FREE);
-                        }
 
                         break;
 
                     case 1:
 
-                        PlayerAction playerAction = (PlayerAction)br.ReadInt16();
+                        if (!battleListWithPlayer.ContainsKey(_playerUnit))
+                        {
+                            PlayerAction playerAction = (PlayerAction)br.ReadInt16();
 
-                        ReceiveActionData(_playerUnit, playerAction);
+                            ReceiveActionData(_playerUnit, playerAction);
+                        }
 
                         break;
                 }
@@ -115,6 +111,10 @@ internal class BattleManager
                 {
                     lastPlayer = _playerUnit;
 
+                    ReplyClient(_playerUnit, PlayerState.SEARCH);
+                }
+                else if (lastPlayer == _playerUnit)
+                {
                     ReplyClient(_playerUnit, PlayerState.SEARCH);
                 }
                 else
@@ -143,6 +143,8 @@ internal class BattleManager
                     battleUnit.Start(_playerUnit, tmpPlayer);
 
                     ReplyClient(_playerUnit, PlayerState.BATTLE);
+
+                    ReplyClient(tmpPlayer, PlayerState.BATTLE);
 
                     battleUnit.Refresh(_playerUnit);
 
@@ -185,7 +187,9 @@ internal class BattleManager
 
         for (int i = 0; i < tmpList.Count; i++)
         {
-            battleListWithPlayer.Remove(tmpList[i]);
+            IUnit unit = tmpList[i];
+
+            battleListWithPlayer.Remove(unit);
         }
 
         battleList.Remove(_battleUnit);
@@ -195,11 +199,36 @@ internal class BattleManager
 
     internal void Update()
     {
+        LinkedList<BattleUnit> delList = null;
+
         Dictionary<BattleUnit, List<IUnit>>.KeyCollection.Enumerator enumerator = battleList.Keys.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
-            enumerator.Current.Update();
+            bool mWin;
+            bool oWin;
+
+            enumerator.Current.Update(out mWin, out oWin);
+
+            if (mWin || oWin)
+            {
+                if (delList == null)
+                {
+                    delList = new LinkedList<BattleUnit>();
+                }
+
+                delList.AddLast(enumerator.Current);
+            }
+        }
+
+        if (delList != null)
+        {
+            LinkedList<BattleUnit>.Enumerator enumerator2 = delList.GetEnumerator();
+
+            while (enumerator2.MoveNext())
+            {
+                BattleOver(enumerator2.Current);
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ internal class BattleUnit
     {
         battle = new Battle();
 
-        battle.ServerInit(SendData, BattleOver);
+        battle.ServerInit(SendData);
     }
 
     internal void Start(IUnit _mPlayer, IUnit _oPlayer)
@@ -32,9 +32,9 @@ internal class BattleUnit
         battle.ServerGetBytes(_playerUnit == mPlayer, _bytes);
     }
 
-    internal void Update()
+    internal void Update(out bool _mWin, out bool _oWin)
     {
-        battle.Update();
+        battle.Update(out _mWin, out _oWin);
     }
 
     private void SendData(bool _isMine, MemoryStream _ms)
@@ -61,10 +61,5 @@ internal class BattleUnit
                 }
             }
         }
-    }
-
-    private void BattleOver()
-    {
-        BattleManager.Instance.BattleOver(this);
     }
 }
